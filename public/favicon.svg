@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Fondo oscuro con bordes redondeados -->
+  <rect width="128" height="128" rx="30" fill="#1a1a1a" />
+  
+  <!-- Borde dorado sutil para contraste en temas oscuros -->
+  <rect x="4" y="4" width="120" height="120" rx="26" fill="none" stroke="#eab308" stroke-width="4" stroke-opacity="0.5" />
+  
+  <!-- Monograma DO simplificado y robusto -->
+  <text 
+    x="64" 
+    y="86" 
+    font-family="Arial, Helvetica, sans-serif" 
+    font-weight="900" 
+    font-size="75" 
+    fill="#eab308" 
+    text-anchor="middle"
+    style="letter-spacing: -2px"
+  >DO</text>
+  
+  <!-- Línea de acento (estilo soldadura) simplificada -->
+  <line x1="20" y1="64" x2="108" y2="64" stroke="#1a1a1a" stroke-width="6" stroke-linecap="round" />
+  <line x1="24" y1="64" x2="104" y2="64" stroke="#eab308" stroke-width="3" stroke-linecap="round" />
+</svg>
