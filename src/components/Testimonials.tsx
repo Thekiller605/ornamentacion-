@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Star, Quote } from 'lucide-react';
 
@@ -7,21 +7,51 @@ const testimonials = [
     name: "Carlos Rodríguez",
     role: "Arquitecto",
     content: "Excelente trabajo en la estructura metálica para mi proyecto residencial. Cumplieron con los tiempos y la calidad es insuperable.",
-    rating: 5
+    rating: 5,
+    avatarUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&h=200&q=80&crop=faces"
   },
   {
     name: "Ana Martínez",
     role: "Propietaria de Negocio",
     content: "El diseño de las rejas para mi local quedó espectacular. David entendió perfectamente lo que buscaba y le dio un toque artístico único.",
-    rating: 5
+    rating: 5,
+    avatarUrl: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&h=200&q=80&crop=faces"
   },
   {
     name: "Luis Fernández",
     role: "Constructor",
     content: "Llevo trabajando con ellos en varios proyectos y siempre entregan resultados profesionales. La soldadura es impecable.",
-    rating: 5
+    rating: 5,
+    avatarUrl: "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?auto=format&fit=crop&w=200&h=200&q=80&crop=faces"
   }
 ];
+
+type AvatarProps = {
+  name: string;
+  src?: string;
+};
+
+const Avatar = ({ name, src }: AvatarProps) => {
+  const [imageError, setImageError] = useState(false);
+  const showImage = Boolean(src) && !imageError;
+
+  return (
+    <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-gold-500 to-fire-600 flex items-center justify-center text-white font-bold text-lg mr-3 ring-1 ring-gold-500/30">
+      {showImage ? (
+        <img
+          src={src}
+          alt="Foto de cliente"
+          className="w-full h-full object-cover"
+          loading="lazy"
+          decoding="async"
+          onError={() => setImageError(true)}
+        />
+      ) : (
+        name.charAt(0)
+      )}
+    </div>
+  );
+};
 
 const Testimonials = () => {
   return (
@@ -67,9 +97,7 @@ const Testimonials = () => {
               <p className="text-gray-300 mb-6 italic relative z-10">"{testimonial.content}"</p>
               
               <div className="flex items-center">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gold-500 to-fire-600 flex items-center justify-center text-white font-bold text-lg mr-3">
-                  {testimonial.name.charAt(0)}
-                </div>
+                <Avatar name={testimonial.name} src={testimonial.avatarUrl} />
                 <div>
                   <h4 className="text-white font-semibold">{testimonial.name}</h4>
                   <p className="text-sm text-gray-500">{testimonial.role}</p>

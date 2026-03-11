@@ -2,28 +2,38 @@ import { useEffect } from 'react';
 
 const FaviconAnimator = () => {
   useEffect(() => {
-    // Helper to encode SVG for data URI
+    const mediaQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+    if (mediaQuery?.matches) return;
+
     const encodeSVG = (svgString: string) => {
       return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgString)}`;
     };
 
-    // Base SVG parts (minimized for performance)
-    const bg = `<rect width="128" height="128" rx="30" fill="%231a1a1a" />`;
-    const border = `<rect x="4" y="4" width="120" height="120" rx="26" fill="none" stroke="%23eab308" stroke-width="4" stroke-opacity="0.5" />`;
-    const text = `<text x="64" y="86" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="75" fill="%23eab308" text-anchor="middle" style="letter-spacing: -2px">DO</text>`;
-    const lineBack = `<line x1="20" y1="64" x2="108" y2="64" stroke="%231a1a1a" stroke-width="6" stroke-linecap="round" />`;
-    const lineFront = `<line x1="24" y1="64" x2="104" y2="64" stroke="%23eab308" stroke-width="3" stroke-linecap="round" />`;
+    const bg = `<rect width="128" height="128" rx="30" fill="#1a1a1a" />`;
+    const border = `<rect x="4" y="4" width="120" height="120" rx="26" fill="none" stroke="#eab308" stroke-width="4" stroke-opacity="0.5" />`;
+    const text = `<text x="64" y="86" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="75" fill="#eab308" text-anchor="middle" style="letter-spacing:-2px">DO</text>`;
+    const lineBack = `<line x1="20" y1="64" x2="108" y2="64" stroke="#1a1a1a" stroke-width="6" stroke-linecap="round" />`;
+    const lineFront = `<line x1="24" y1="64" x2="104" y2="64" stroke="#eab308" stroke-width="3" stroke-linecap="round" />`;
 
-    // Function to generate full SVG with spark at specific position
-    const getFrame = (sparkCx: number | null, sparkOpacity: number = 0) => {
+    const getFrame = (sparkCx: number | null, intensity: number = 0) => {
+      const clamped = Math.max(0, Math.min(1, intensity));
       let spark = '';
+
       if (sparkCx !== null) {
+        const coreR = 3.5 + clamped * 2;
+        const glowR = 10 + clamped * 6;
+        const glowOpacity = clamped * 0.6;
+        const coreOpacity = Math.min(1, clamped * 1.1);
+
         spark = `
-          <circle cx="${sparkCx}" cy="64" r="6" fill="white" fill-opacity="${sparkOpacity}" />
-          <circle cx="${sparkCx}" cy="64" r="12" fill="%23fbbf24" fill-opacity="${sparkOpacity * 0.6}" />
+          <g>
+            <line x1="${sparkCx - 10}" y1="64" x2="${sparkCx + 10}" y2="64" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-opacity="${clamped * 0.35}" />
+            <circle cx="${sparkCx}" cy="64" r="${glowR}" fill="#fbbf24" fill-opacity="${glowOpacity}" />
+            <circle cx="${sparkCx}" cy="64" r="${coreR}" fill="white" fill-opacity="${coreOpacity}" />
+          </g>
         `;
       }
-      
+
       const svg = `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
           ${bg}
@@ -34,48 +44,108 @@ const FaviconAnimator = () => {
           ${spark}
         </svg>
       `.trim().replace(/\s+/g, ' ');
-      
+
       return encodeSVG(svg);
     };
 
-    // Define animation frames: Pause -> Spark Start -> Middle -> End -> Pause
-    const frames = [
-      getFrame(null),          // Frame 0: Static (Pause)
-      getFrame(null),          // Frame 1: Static (Pause)
-      getFrame(30, 0.8),       // Frame 2: Spark Start
-      getFrame(64, 1),         // Frame 3: Spark Middle
-      getFrame(98, 0.8),       // Frame 4: Spark End
-      getFrame(null),          // Frame 5: Static (Pause)
-    ];
+    const easeInOutCubic = (t: number) => {
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    };
+
+    const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
+    const buildFrames = () => {
+      const frames: string[] = [];
+
+      const pushPause = (count: number) => {
+        for (let i = 0; i < count; i++) frames.push(getFrame(null));
+      };
+
+      pushPause(10);
+
+      const sparkStartX = 30;
+      const sparkEndX = 98;
+      const steps = 16;
+
+      for (let i = 0; i < steps; i++) {
+        const t = steps === 1 ? 1 : i / (steps - 1);
+        const eased = easeInOutCubic(t);
+        const cx = Math.round(lerp(sparkStartX, sparkEndX, eased));
+        const intensity = Math.sin(Math.PI * t);
+        frames.push(getFrame(cx, intensity));
+      }
+
+      pushPause(12);
+
+      return frames;
+    };
+
+    const frames = buildFrames();
+
+    const iconLinks = Array.from(
+      document.querySelectorAll<HTMLLinkElement>("link[rel*='icon']")
+    );
+
+    if (iconLinks.length === 0) {
+      const link = document.createElement('link');
+      link.rel = 'icon';
+      document.head.appendChild(link);
+      iconLinks.push(link);
+    }
+
+    const originalHrefs = iconLinks.map((l) => l.getAttribute('href'));
 
     let currentFrameIndex = 0;
-    
-    const updateFavicon = () => {
-      const links = document.querySelectorAll("link[rel*='icon']");
-      const newHref = frames[currentFrameIndex];
-      
-      links.forEach(link => {
-        link.setAttribute('href', newHref);
-      });
+    let lastHref = '';
 
+    const applyHref = (href: string) => {
+      if (href === lastHref) return;
+      iconLinks.forEach((link) => link.setAttribute('href', href));
+      lastHref = href;
+    };
+
+    const updateFavicon = () => {
+      applyHref(frames[currentFrameIndex]);
       currentFrameIndex = (currentFrameIndex + 1) % frames.length;
     };
 
-    // Start animation loop (400ms per frame)
-    const intervalId = setInterval(updateFavicon, 400);
+    const frameMs = 120;
+    let intervalId: number | undefined;
 
-    // Cleanup on unmount
+    const start = () => {
+      if (intervalId !== undefined) return;
+      updateFavicon();
+      intervalId = window.setInterval(updateFavicon, frameMs);
+    };
+
+    const stop = () => {
+      if (intervalId === undefined) return;
+      window.clearInterval(intervalId);
+      intervalId = undefined;
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) stop();
+      else start();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    start();
+
     return () => {
-      clearInterval(intervalId);
-      // Restore original static favicon
-      const links = document.querySelectorAll("link[rel*='icon']");
-      links.forEach(link => {
-        link.setAttribute('href', '/favicon.svg?v=4');
+      stop();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+
+      iconLinks.forEach((link, idx) => {
+        const original = originalHrefs[idx];
+        if (original) link.setAttribute('href', original);
+        else link.removeAttribute('href');
       });
     };
   }, []);
 
-  return null; // This component doesn't render anything in the DOM
+  return null;
 };
 
 export default FaviconAnimator;
