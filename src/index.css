@@ -18,3 +18,23 @@
     @apply bg-metal-900 text-gray-100;
   }
 }
+
+@layer utilities {
+  .mobile-only {
+    display: block;
+  }
+
+  .desktop-only {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .mobile-only {
+      display: none;
+    }
+
+    .desktop-only {
+      display: block;
+    }
+  }
+}

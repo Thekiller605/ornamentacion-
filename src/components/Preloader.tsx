@@ -1,8 +1,12 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import Logo from './Logo';
 
 const Preloader = () => {
+  const rand = (seed: number) => {
+    const x = Math.sin(seed) * 10000;
+    return x - Math.floor(x);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 1 }}
@@ -11,32 +15,41 @@ const Preloader = () => {
     >
       {/* Background Spark Effects */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(20)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute bg-fire-500 rounded-full"
-            initial={{ 
-              x: "50%", 
-              y: "50%", 
-              width: 0, 
-              height: 0, 
-              opacity: 1 
-            }}
-            animate={{ 
-              x: `${Math.random() * 100}%`, 
-              y: `${Math.random() * 100}%`, 
-              width: Math.random() * 4, 
-              height: Math.random() * 4, 
-              opacity: 0 
-            }}
-            transition={{ 
-              duration: 1 + Math.random() * 2, 
-              repeat: Infinity, 
-              repeatDelay: Math.random() * 2,
-              ease: "easeOut" 
-            }}
-          />
-        ))}
+        {Array.from({ length: 20 }, (_, i) => {
+          const x = `${rand(i * 12.9898 + 78.233) * 100}%`;
+          const y = `${rand(i * 93.9898 + 67.345) * 100}%`;
+          const width = rand(i * 45.332 + 12.345) * 4;
+          const height = rand(i * 17.123 + 98.765) * 4;
+          const duration = 1 + rand(i * 0.123 + 4.567) * 2;
+          const repeatDelay = rand(i * 0.456 + 8.901) * 2;
+
+          return (
+            <motion.div
+              key={i}
+              className="absolute bg-fire-500 rounded-full"
+              initial={{ 
+                x: "50%", 
+                y: "50%", 
+                width: 0, 
+                height: 0, 
+                opacity: 1 
+              }}
+              animate={{ 
+                x, 
+                y, 
+                width, 
+                height, 
+                opacity: 0 
+              }}
+              transition={{ 
+                duration, 
+                repeat: Infinity, 
+                repeatDelay,
+                ease: "easeOut" 
+              }}
+            />
+          );
+        })}
       </div>
 
       <div className="relative z-10 flex flex-col items-center">

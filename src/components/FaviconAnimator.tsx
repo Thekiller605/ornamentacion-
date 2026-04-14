@@ -65,7 +65,7 @@ const FaviconAnimator = () => {
 
       const sparkStartX = 30;
       const sparkEndX = 98;
-      const steps = 16;
+      const steps: number = 16;
 
       for (let i = 0; i < steps; i++) {
         const t = steps === 1 ? 1 : i / (steps - 1);

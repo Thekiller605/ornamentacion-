@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import type { FC } from 'react';
 
 interface LogoProps {
   className?: string;
@@ -6,7 +6,6 @@ interface LogoProps {
 }
 
 const Logo: FC<LogoProps> = ({ className = "h-12", variant = 'white' }) => {
-  const primaryColor = variant === 'gold' ? '#eab308' : '#ffffff';
   const accentColor = '#eab308'; // Gold color for the signature
   
   return (

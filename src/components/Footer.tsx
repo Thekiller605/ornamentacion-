@@ -1,4 +1,4 @@
-import { Facebook, Instagram, Twitter } from 'lucide-react';
+import { Facebook, Instagram } from 'lucide-react';
 import Logo from './Logo';
 
 const Footer = () => {
@@ -38,14 +38,17 @@ const Footer = () => {
           <div>
             <h4 className="text-lg font-semibold mb-4 text-gold-500">Síguenos</h4>
             <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a 
+                href="https://www.facebook.com/profile.php?id=61570717554696" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-gray-400 hover:text-[#1877F2] transition-colors"
+                aria-label="Facebook"
+              >
                 <Facebook className="h-6 w-6" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a href="#" className="text-gray-400 hover:text-[#E4405F] transition-colors" aria-label="Instagram">
                 <Instagram className="h-6 w-6" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <Twitter className="h-6 w-6" />
               </a>
             </div>
           </div>
@@ -53,7 +56,7 @@ const Footer = () => {
         
         <div className="border-t border-metal-800 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-500 text-sm text-center md:text-left">
-            &copy; {new Date().getFullYear()} Hierro y Fuego. Todos los derechos reservados.
+            &copy; {new Date().getFullYear()}  Todos los derechos reservados.
           </p>
         </div>
       </div>

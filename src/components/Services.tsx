@@ -1,4 +1,6 @@
 import { motion } from 'framer-motion';
+import { ArrowLeft } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
 
 type ServiceIconProps = {
   className?: string;
@@ -96,9 +98,25 @@ const services = [
 ];
 
 const Services = () => {
+  const { pathname } = useLocation();
+  const showBackToHome = pathname !== '/';
+
   return (
     <section className="py-20 bg-metal-800" id="servicios">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {showBackToHome && (
+          <div className="mb-8">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 text-gold-500 hover:text-white transition-colors"
+              aria-label="Volver al inicio"
+            >
+              <ArrowLeft className="h-5 w-5" />
+              <span className="text-sm font-semibold">Volver al inicio</span>
+            </Link>
+          </div>
+        )}
+
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Nuestros Servicios</h2>
           <div className="w-24 h-1 bg-gold-500 mx-auto rounded"></div>
@@ -122,6 +140,21 @@ const Services = () => {
               <p className="text-gray-400">{service.description}</p>
             </motion.div>
           ))}
+        </div>
+
+        <div className="mt-14 grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="bg-metal-900 p-8 rounded-lg border border-metal-700">
+            <h3 className="text-2xl font-bold text-white mb-3">Misión</h3>
+            <p className="text-gray-300 leading-relaxed">
+              Diseñar, fabricar e instalar soluciones en herrería y estructuras metálicas a medida, garantizando seguridad, durabilidad y acabados de alta calidad, con un servicio responsable y orientado a la satisfacción del cliente.
+            </p>
+          </div>
+          <div className="bg-metal-900 p-8 rounded-lg border border-metal-700">
+            <h3 className="text-2xl font-bold text-white mb-3">Visión</h3>
+            <p className="text-gray-300 leading-relaxed">
+              Consolidarnos como una marca referente en ornamentación y metalmecánica, reconocida por su diseño, precisión en la ejecución y cumplimiento, ampliando nuestra presencia en proyectos residenciales e industriales.
+            </p>
+          </div>
         </div>
       </div>
     </section>
